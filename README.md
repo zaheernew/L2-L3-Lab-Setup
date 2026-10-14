@@ -611,13 +611,24 @@ write memory
 #### Final verifications and troubleshooting
 
 
-icmp packet capture in the firewall
+* IXMP packet capture in the firewall
 
 ```
 diagnose sniffer packet any 'icmp' 4 0 1
 ```
 
-show all arouting in the firewall
+* Show all arouting in the firewall
+
 ```
 get router info routing-table all
+```
+* Web traffic on firewall
+
+    check with and traceroute
+
+    check with ping
+  
+```
+ping 10.100.2.10
+traceroute 10.100.2.10
 ```
