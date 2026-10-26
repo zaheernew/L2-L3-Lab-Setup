@@ -611,7 +611,7 @@ write memory
 #### Final verifications and troubleshooting
 
 
-* IXMP packet capture in the firewall
+* ICMP packet capture in the firewall
 
 ```
 diagnose sniffer packet any 'icmp' 4 0 1
@@ -627,8 +627,70 @@ get router info routing-table all
     check with and traceroute
 
     check with ping
+
+
   
 ```
-ping 10.100.2.10
-traceroute 10.100.2.10
+execute ping 10.100.2.10
+execute traceroute 10.100.2.10
 ```
+### Block "www.facebook.com"
+
+##### Create the Facebook FQDN address object 
+```
+config firewall address
+    edit "www-facebook-com"
+        set type fqdn
+        set fqdn "www.facebook.com"
+    next
+end
+```
+
+##### Create the deny policy
+
+
+Your existing interfaces are vlan10 (LAN) and port2 (WAN).
+
+
+```
+config firewall policy
+    edit 4
+        set name "DENY-www-Facebook"
+        set srcintf "vlan10"
+        set dstintf "port2"
+        set srcaddr "all"
+        set dstaddr "www-facebook-com"
+        set action deny
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+        set nat disable
+    next
+end
+```
+
+##### Move the deny policy to the top
+
+
+Your existing LAN-to-WAN policy is ID 1. Move policy 4 above it:
+
+```
+config firewall policy
+    move 4 before 1
+end
+```
+
+##### Verify the configuration
+
+```
+show firewall address "www-facebook-com"
+show firewall policy
+```
+
+#### Test from PC
+
+```
+nslookup www.facebook.com
+curl -I --max-time 10 https://www.facebook.com
+```
+
